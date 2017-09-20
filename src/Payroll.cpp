@@ -1,66 +1,92 @@
-#include "Payroll.h"
-
-const double STANDARD_WEEK_HOURS = 40;
-const double OVER_TIME_MULTIPLIER = 1.5;
-const double SALARY_FREQUENCY = 26;
-
-/**
- * Returns over time hours
- *
- * @param totalHours the total hours worked for one week
- * @return over time hours worked in one week
- */
-double getOvertimeHours(double totalHours)
+#include"Payroll.h"
+#include <sstream>
+#include<iostream>
+#include<iomanip>
+double ot(double hours)
 {
-    double hours = 0;
-
-    if(totalHours > STANDARD_WEEK_HOURS)
-    {
-        hours =  totalHours - STANDARD_WEEK_HOURS;
-    }
-
-    return hours;
+	double ot = 0;
+	if (hours > 40)
+	{
+		ot = hours - 40;
+	}
+	return ot;
 }
 
-/**
- * Returns regular payroll hours
- *
- * @param totalHours total hours worked for one week
- * @return regular payroll hours excluding over time hours
- */
-double getRegularHours(double totalHours)
+double regularpay(double reg_hours, double pay_rate)
 {
-    double hours = totalHours;
-
-    if(totalHours > 40)
-        hours = 40;
-    else if(totalHours < 0)
-        hours = 0;
-
-    return hours;
+	double regularpay;
+	regularpay = reg_hours*pay_rate;
+	return regularpay;
 }
 
-/**
-  Returns gross pay for an hourly employee
 
-  @param totalHours expects hours greater than 0
-  @param hourlyRate expects a rate greater than 0
- * */
-double getGrossPay(double regularHours, double overtimeHours, double hourlyRate)
+double otpay(double pay_rate, double ot)
 {
-    double grossPay = regularHours * hourlyRate + overtimeHours * hourlyRate * OVER_TIME_MULTIPLIER;
+	double grosspay;
+	const double vt_rate = 1.5;
+	grosspay = ot*vt_rate*pay_rate;
 
-    return grossPay;
+	return grosspay;
 }
 
-/**
- * Returns gross salary for a salaried employee for a salary frequency(biweekly)
- *
- * @param salary the yearly salary
- * @return the salary frequence(biweekly) salary
- */
-double getGrossPay(double salary)
+double grosspay(double regularpay, double otpay)
 {
-    return salary / SALARY_FREQUENCY;
+	double grosspay = regularpay + otpay;
+	return grosspay;
 }
 
+double grosspay(double salary)
+{
+	const double period = 26;
+	double grosspay = salary / period;
+	return grosspay;
+}
+
+double getFIT(double grosspay)
+{
+	const double fit_rate = 0.15;
+	double fit = grosspay * fit_rate;
+	return fit;
+
+}
+double getFICASSN(double grosspay)
+{
+	const double ssn_rate = 0.062;
+	double ssn = grosspay * ssn_rate;
+	return ssn;
+}
+
+double getFICAMED(double grosspay)
+{
+	const double med_rate = 0.0145;
+	double med = grosspay * med_rate;
+	return med;
+}
+
+double getNetpay(double grosspay, double fit, double ssn, double med)
+{
+	double netpay = grosspay - fit - ssn - med;
+	return netpay;
+}
+
+string contoStr(double db) {
+	string str;
+	stringstream ss;
+	ss << db;
+	str = ss.str();
+	return str;
+}
+
+void printout(string  results[])
+{
+	cout << left << setw(30) << "Name" << right << setw(10) << "Hours" << setw(10) << "OT Hours" << setw(10) << "Rate";
+	cout << setw(10) << " OT Rate" << setw(14) << "Regular Pay" << setw(10) << "OT Pay" << setw(10) << "Grosspay";
+	cout << setw(10) << "FICA SSN" << setw(10) << "FICA Med" << setw(10) << "FIT" << setw(10) << "Net Pay" << endl;
+	for (int i = 0; i < 3; i++ )
+	{
+		cout << left << setw(30) << results[0+i*12] << right << setw(10) << results[1 + i * 12] << setw(10) << results[2 + i * 12] 
+			<< setw(10) << results[3+ i * 12] << setw(10) << results[4 + i * 12] << setw(14) << results[5 + i * 12]
+			<< setw(10) << results[6 + i * 12] << setw(10) << results[7 + i * 12] << setw(10) << results[8 + i * 12] << setw(10) 
+			<< results[9 + i * 12] << setw(10) << results[10 + i * 12] << setw(10) << results[11 + i * 12] << endl;
+	}
+}
